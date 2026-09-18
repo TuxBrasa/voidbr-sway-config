@@ -1,0 +1,105 @@
+[Desktop Entry]
+Type=Application
+
+Name=Sway
+Name[ar]=Sway
+Name[ast]=Sway
+Name[bn]=Sway
+Name[ca]=Sway
+Name[cs]=Sway
+Name[da]=Sway
+Name[el]=Sway
+Name[es]=Sway
+Name[et]=Sway
+Name[fa]=Sway
+Name[fi]=Sway
+Name[fr]=Sway
+Name[gl]=Sway
+Name[he]=Sway
+Name[hr]=Sway
+Name[hu]=Sway
+Name[it]=Sway
+Name[ja]=Sway
+Name[ko]=Sway
+Name[ku]=Sway
+Name[lt]=Sway
+Name[nb]=Sway
+Name[nl]=Sway
+Name[nn]=Sway
+Name[no]=Sway
+Name[pl]=Sway
+Name[pt]=Sway
+Name[pt_BR]=Sway
+Name[ro]=Sway
+Name[ru]=Sway
+Name[sk]=Sway
+Name[sl]=Sway
+Name[sv]=Sway
+Name[tr]=Sway
+Name[ug]=Sway
+Name[uk]=Sway
+Name[vi]=Sway
+Name[zh_CN]=Sway
+Name[zh_TW]=Sway
+
+
+Comment=An i3-compatible Wayland compositor
+Comment[ar]=مركب Wayland متوافق مع i3
+Comment[ast]=Un compositor Wayland compatible con i3
+Comment[bn]=i3-সামঞ্জস্যপূর্ণ একটি Wayland কম্পোজিটর
+Comment[ca]=Un compositor Wayland compatible amb i3
+Comment[cs]=Kompozitor Wayland kompatibilní s i3
+Comment[da]=En i3-kompatibel Wayland-compositor
+Comment[el]=Ένας συμβατός με το i3 συνθέτης Wayland
+Comment[es]=Un compositor Wayland compatible con i3
+Comment[et]=i3-ga ühilduv Waylandi komposiitor
+Comment[fa]=یک کامپوزیتور Wayland سازگار با i3
+Comment[fi]=i3-yhteensopiva Wayland-koostaja
+Comment[fr]=Un compositeur Wayland compatible avec i3
+Comment[gl]=Un compositor Wayland compatible con i3
+Comment[he]=מנהל חלונות Wayland תואם i3
+Comment[hr]=Wayland kompozitor kompatibilan s i3
+Comment[hu]=i3-kompatibilis Wayland kompozitor
+Comment[it]=Un compositore Wayland compatibile con i3
+Comment[ja]=i3互換のWaylandコンポジター
+Comment[ko]=i3 호환 Wayland 컴포지터
+Comment[ku]=Kompozîtorê Waylandê ku bi i3 re hevaheng e
+Comment[lt]=Su i3 suderinamas Wayland kompozitorius
+Comment[nb]=En i3-kompatibel Wayland-kompositor
+Comment[nl]=Een met i3 compatibele Wayland-compositor
+Comment[nn]=Ein i3-kompatibel Wayland-kompositor
+Comment[no]=En i3-kompatibel Wayland-kompositor
+Comment[pl]=Kompozytor Wayland kompatybilny z i3
+Comment[pt]=Um compositor Wayland compatível com i3
+Comment[pt_BR]=Um compositor Wayland compatível com i3
+Comment[ro]=Un compozitor Wayland compatibil cu i3
+Comment[ru]=Композитный менеджер Wayland, совместимый с i3
+Comment[sk]=Kompozitor Wayland kompatibilný s i3
+Comment[sl]=Waylandov kompozitor, združljiv z i3
+Comment[sv]=En i3-kompatibel Wayland-kompositor
+Comment[tr]=i3 uyumlu bir Wayland bileşikleştiricisi
+Comment[ug]=i3 بىلەن ماسلىشىدىغان Wayland كومپوزىتورى
+Comment[uk]=Композитор Wayland, сумісний з i3
+Comment[vi]=Trình kết hợp Wayland tương thích với i3
+Comment[zh_CN]=兼容 i3 的 Wayland 合成器
+Comment[zh_TW]=相容於 i3 的 Wayland 合成器
+
+
+
+# Dependendo do display manager (GDM, SDDM, etc.), ele próprio pode definir 
+# XDG_SESSION_DESKTOP a partir do .desktop/sessão. Então colocar a variável no Exec pode 
+# ser redundante.
+
+# O greetd não é um display manager tradicional que necessariamente vai interpretar 
+# DesktopNames= e preencher todas as variáveis XDG_* para você. Ele inicia a sessão 
+# conforme a configuração do greetd e/ou do greeter.
+
+# Exec=sway
+
+Exec=env XDG_CURRENT_DESKTOP=sway XDG_SESSION_DESKTOP=sway dbus-run-session sway
+
+# Exec=dbus-run-session sway
+
+
+DesktopNames=sway;wlroots
+

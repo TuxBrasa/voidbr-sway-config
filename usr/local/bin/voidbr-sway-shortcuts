@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+import gettext
+import gi
+
+gi.require_version("Gtk", "4.0")
+from gi.repository import Gtk, Gdk
+
+APPNAME = "voidbr-shortcuts"
+LOCALEDIR = "/usr/share/locale"
+
+gettext.bindtextdomain(APPNAME, LOCALEDIR)
+gettext.textdomain(APPNAME)
+_ = gettext.gettext
+
+SHORTCUTS = [
+    (_("Geral"), [
+        ("Super + Enter", _("Abrir terminal")),
+        ("Super + D", _("Abrir lançador de Programas")),
+        ("Super + Shift + C", _("Recarregar configuração do Sway")),
+        ("Super + Shift + R", _("Reiniciar o Sway")),
+        ("Super + Shift + E", _("Encerrar sessão do Sway")),
+        ("Alt + F4", _("Fechar janela em foco")),
+        ("Alt + L", _("Bloquear tela")),
+        ("Print", _("Capturar tela")),
+    ]),
+    (_("Foco"), [
+        ("Super + Left", _("Mover foco para a esquerda")),
+        ("Super + Down", _("Mover foco para baixo")),
+        ("Super + Up", _("Mover foco para cima")),
+        ("Super + Right", _("Mover foco para a direita")),
+        ("Super + H", _("Mover foco para a esquerda")),
+        ("Super + J", _("Mover foco para baixo")),
+        ("Super + K", _("Mover foco para cima")),
+        ("Super + L", _("Mover foco para a direita")),
+        ("Super + A", _("Mover foco para o contêiner pai")),
+        ("Super + Tab", _("Alternar para a janela anterior")),
+    ]),
+    (_("Mover Janelas"), [
+        ("Super + Shift + Left", _("Mover janela para a esquerda")),
+        ("Super + Shift + Down", _("Mover janela para baixo")),
+        ("Super + Shift + Up", _("Mover janela para cima")),
+        ("Super + Shift + Right", _("Mover janela para a direita")),
+        ("Super + Shift + H", _("Mover janela para a esquerda")),
+        ("Super + Shift + J", _("Mover janela para baixo")),
+        ("Super + Shift + K", _("Mover janela para cima")),
+        ("Super + Shift + L", _("Mover janela para a direita")),
+    ]),
+    (_("Layouts"), [
+        ("Super + B", _("Divisão horizontal")),
+        ("Super + V", _("Divisão vertical")),
+        ("Super + S", _("Layout empilhado")),
+        ("Super + W", _("Layout em abas")),
+        ("Super + E", _("Alternar modo de divisão")),
+        ("Super + F", _("Alternar tela cheia")),
+        ("Super + Space", _("Alternar modo flutuante")),
+        ("Super + Shift + Space", _("Alternar modo de foco")),
+    ]),
+    (_("Scratchpad"), [
+        ("Super + Shift + Minus", _("Enviar janela para o scratchpad")),
+        ("Super + Minus", _("Exibir scratchpad")),
+    ]),
+    (_("Áreas de Trabalho"), [
+        ("Super + 1..0", _("Alternar área de trabalho")),
+        ("Super + Shift + 1..0", _("Mover janela para a área de trabalho")),
+    ]),
+    (_("Redimensionamento"), [
+        ("Super + R", _("Entrar no modo de redimensionamento")),
+        ("← ↑ ↓ → / H J K L", _("Redimensionar janela")),
+        ("Enter / Esc", _("Sair do modo de redimensionamento")),
+    ]),
+    (_("Multimídia"), [
+        ("XF86AudioRaiseVolume", _("Aumentar volume")),
+        ("XF86AudioLowerVolume", _("Diminuir volume")),
+        ("XF86AudioMute", _("Ativar/Desativar mudo")),
+        ("XF86AudioPlay", _("Reproduzir/Pausar")),
+        ("XF86AudioNext", _("Próxima faixa")),
+        ("XF86AudioPrev", _("Faixa anterior")),
+        ("XF86MonBrightnessUp", _("Aumentar brilho")),
+        ("XF86MonBrightnessDown", _("Diminuir brilho")),
+    ]),
+    (_("Mouse"), [
+        ("Super + Left Mouse", _("Mover janela")),
+        ("Super + Right Mouse", _("Redimensionar janela")),
+    ]),
+    (_("VoidBR"), [
+        ("Super + F1", _("Atalhos do VoidBR Sway")),
+    ]),
+]
+
+CSS = b"""
+window { background:#202225; }
+headerbar { background:#2b2d31; }
+.title { font-size:18px; font-weight:bold; }
+.key { font-family:Monospace; font-weight:bold; color:#8be9fd; }
+.desc { color:#f8f8f2; }
+.section { font-weight:bold; color:#8be9fd; margin-top:6px; margin-bottom:2px; }
+list row { padding:0; }
+"""
+
+class Win(Gtk.ApplicationWindow):
+    def __init__(self, app):
+        super().__init__(application=app, title=_("Atalhos do VoidBR Sway"))
+        self.set_default_size(760, 600)
+        self.set_resizable(False)
+
+        css = Gtk.CssProvider()
+        css.load_from_data(CSS)
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(), css,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        hb = Gtk.HeaderBar()
+        title = Gtk.Label(label=_("Atalhos do VoidBR Sway"))
+        title.add_css_class("title")
+        hb.set_title_widget(title)
+        self.set_titlebar(hb)
+
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL,
+                       spacing=6,
+                       margin_top=10, margin_bottom=10,
+                       margin_start=12, margin_end=12)
+
+        self.search = Gtk.SearchEntry()
+        self.search.set_placeholder_text(_("Pesquisar atalhos..."))
+        root.append(self.search)
+
+        self.listbox = Gtk.ListBox()
+        self.listbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.rows = []
+
+        self.search.connect("search-changed", self.filter_rows)
+
+        for section, items in SHORTCUTS:
+            lbl = Gtk.Label(xalign=0)
+            lbl.set_markup(f"<b>{section}</b>")
+            lbl.add_css_class("section")
+            row = Gtk.ListBoxRow(selectable=False)
+            row.set_child(lbl)
+            self.listbox.append(row)
+            self.rows.append((row, section.lower(), True))
+
+            for key, desc in items:
+                h = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16,
+                            margin_top=1, margin_bottom=1,
+                            margin_start=6, margin_end=6)
+                k = Gtk.Label(label=key, xalign=0)
+                k.add_css_class("key")
+                k.set_size_request(260, -1)
+                d = Gtk.Label(label=desc, xalign=0)
+                d.add_css_class("desc")
+                h.append(k)
+                h.append(d)
+                r = Gtk.ListBoxRow(selectable=False)
+                r.set_child(h)
+                self.listbox.append(r)
+                self.rows.append((r, (key + " " + desc).lower(), False))
+
+        sw = Gtk.ScrolledWindow(vexpand=True)
+        sw.set_child(self.listbox)
+        root.append(sw)
+
+        btn = Gtk.Button(label=_("Fechar"))
+        btn.connect("clicked", lambda *_: self.close())
+        root.append(btn)
+
+        self.set_child(root)
+
+        ctrl = Gtk.EventControllerKey()
+        ctrl.connect("key-pressed", self.on_key)
+        self.add_controller(ctrl)
+
+    def filter_rows(self, entry):
+        txt = entry.get_text().lower().strip()
+        visible = False
+        for row, content, is_section in reversed(self.rows):
+            if is_section:
+                row.set_visible(visible or txt == "")
+                visible = False
+            else:
+                ok = txt in content
+                row.set_visible(ok)
+                if ok:
+                    visible = True
+
+    def on_key(self, controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Escape:
+            self.close()
+            return True
+        return False
+
+class App(Gtk.Application):
+    def __init__(self):
+        super().__init__(application_id="org.voidbr.shortcuts")
+
+    def do_activate(self):
+        Win(self).present()
+
+if __name__ == "__main__":
+    App().run()
